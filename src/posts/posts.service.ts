@@ -11,23 +11,24 @@ export class PostsService {
     @InjectRepository(Post) private postsRepository: Repository<Post>,
   ) {}
 
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+  async create(createPostDto: CreatePostDto): Promise<Post> {
+    return this.postsRepository.save(createPostDto);
   }
 
   async findAll(): Promise<Post[]> {
     return this.postsRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  async findOne(id: string): Promise<Post> {
+    return this.postsRepository.findOneBy({ id });
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
+    await this.postsRepository.update(id, updatePostDto);
+    return this.postsRepository.findOneBy({ id });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: string): Promise<void> {
+    await this.postsRepository.delete({ id });
   }
 }
