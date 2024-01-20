@@ -2,8 +2,6 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Post } from 'src/posts/entities/post.entity';
 
 export default {
-  mongoURI:
-    'mongodb+srv://kofta:kokoko555@senko-cluster.6prehi1.mongodb.net/?retryWrites=true&w=majority',
   sqlConfig: {
     type: 'mysql',
     host: 'localhost',
