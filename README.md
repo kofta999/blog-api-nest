@@ -1,4 +1,4 @@
-Here's a high-level overview of the features you might want to implement:
+Here's a high-level overview of the features I might want to implement:
 
 1. **User Authentication**: Users should be able to register and log in. You can use Passport.js with JWT strategy for this.
 
