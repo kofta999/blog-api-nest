@@ -12,7 +12,7 @@ import {
 import { PostsService } from './posts.service';
 import { CreatePostDto, createPostSchema } from './dto/create-post.dto';
 import { UpdatePostDto, updatePostSchema } from './dto/update-post.dto';
-import { ZodValidationPipe } from './pipes/validation.pipe';
+import { ZodValidationPipe } from '../pipes/validation.pipe';
 
 @Controller('posts')
 export class PostsController {
@@ -21,7 +21,6 @@ export class PostsController {
   @Post()
   @UsePipes(new ZodValidationPipe(createPostSchema))
   create(@Body() createPostDto: CreatePostDto) {
-    console.log('here');
     return this.postsService.create(createPostDto);
   }
 
