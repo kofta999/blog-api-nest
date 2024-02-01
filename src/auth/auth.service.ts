@@ -8,9 +8,7 @@ export class AuthService {
   async createToken(payload: {
     sub: string;
     username: string;
-  }): Promise<{ accessToken: string }> {
-    return {
-      accessToken: await this.jwtService.signAsync(payload),
-    };
+  }): Promise<string> {
+    return await this.jwtService.signAsync(payload);
   }
 }

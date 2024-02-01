@@ -39,7 +39,7 @@ export class UsersService {
 
   async login(
     loginUserDto: LoginUserDto,
-  ): Promise<{ accessToken: string }> | null {
+  ): Promise<{ accessToken: string | null; error: string | null }> | null {
     const currentUser = await this.userRepository.findOne({
       where: [
         { email: loginUserDto.email },
@@ -58,11 +58,15 @@ export class UsersService {
 
     if (!isPasswordValid) {
       // return ?
+      return { accessToken: null, error: 'Password Invalid' };
     }
 
     // create jwt and return
     const payload = { sub: currentUser.id, username: currentUser.username };
 
-    return await this.authService.createToken(payload);
+    return {
+      accessToken: await this.authService.createToken(payload),
+      error: null,
+    };
   }
 }

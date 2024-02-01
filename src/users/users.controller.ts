@@ -3,7 +3,9 @@ import {
   ConflictException,
   Controller,
   HttpCode,
+  NotFoundException,
   Post,
+  UnauthorizedException,
   UsePipes,
 } from '@nestjs/common';
 import { CreateUserDto, createUserSchema } from './dto/create-user.dto';
@@ -33,6 +35,17 @@ export class UsersController {
   @Public()
   @UsePipes(new ZodValidationPipe(loginUserSchema))
   async login(@Body() loginUserDto: LoginUserDto) {
-    return this.usersService.login(loginUserDto);
+    const result = await this.usersService.login(loginUserDto);
+
+    if (!result) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (result.error) {
+      throw new UnauthorizedException(result.error);
+    }
+
+    delete result.error;
+    return result;
   }
 }
