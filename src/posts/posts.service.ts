@@ -29,6 +29,14 @@ export class PostsService {
     return this.postsRepository.findOneBy({ id });
   }
 
+  async findByUser(userId: string): Promise<Post[]> {
+    return this.postsRepository.find({
+      where: {
+        userId: userId,
+      },
+    });
+  }
+
   async update(id: string, updatePostDto: UpdatePostDto): Promise<Post | null> {
     const updatedPost = await this.postsRepository.preload({
       id,
