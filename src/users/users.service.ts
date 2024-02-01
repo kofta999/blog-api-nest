@@ -5,13 +5,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { LoginUserDto } from './dto/login-user.dto';
-import { JwtService } from '@nestjs/jwt';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    private jwtService: JwtService,
+    private authService: AuthService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> | null {
@@ -63,8 +63,6 @@ export class UsersService {
     // create jwt and return
     const payload = { sub: currentUser.id, username: currentUser.username };
 
-    return {
-      accessToken: await this.jwtService.signAsync(payload),
-    };
+    return await this.authService.createToken(payload);
   }
 }
