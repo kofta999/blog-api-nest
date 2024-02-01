@@ -14,6 +14,17 @@ export class UsersService {
     private authService: AuthService,
   ) {}
 
+  async findOne(id: string): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+      },
+    });
+  }
+
   async create(createUserDto: CreateUserDto): Promise<User> | null {
     const currentUser = await this.userRepository.findOne({
       where: {

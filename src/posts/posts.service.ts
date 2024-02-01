@@ -4,6 +4,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class PostsService {
@@ -11,8 +12,13 @@ export class PostsService {
     @InjectRepository(Post) private postsRepository: Repository<Post>,
   ) {}
 
-  async create(createPostDto: CreatePostDto): Promise<Post> {
-    return this.postsRepository.save(createPostDto);
+  async create(createPostDto: CreatePostDto, user: User): Promise<Post> {
+    const post = new Post();
+    post.content = createPostDto.content;
+    post.title = createPostDto.title;
+    post.user = user;
+
+    return this.postsRepository.save(post);
   }
 
   async findAll(): Promise<Post[]> {

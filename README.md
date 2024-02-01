@@ -1,6 +1,6 @@
 Here's a high-level overview of the features I might want to implement:
 
-1. **User Authentication**: Users should be able to register and log in. You can use Passport.js with JWT strategy for this.
+1. **User Authentication**: Users should be able to register and log in. Implemented, only refresh tokens and logout remains 
 
 2. **Post Creation**: Authenticated users should be able to create a new blog post. Each post would have a title, body, author (the authenticated user), and timestamps for creation and updates.
 
