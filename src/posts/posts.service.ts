@@ -18,7 +18,12 @@ export class PostsService {
     post.title = createPostDto.title;
     post.user = user;
 
-    return this.postsRepository.save(post);
+    const newPost = await this.postsRepository.save(post);
+    if (newPost && newPost.user) {
+      delete newPost.user;
+    }
+
+    return newPost;
   }
 
   async findAll(): Promise<Post[]> {
@@ -37,15 +42,42 @@ export class PostsService {
     });
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post | null> {
-    const updatedPost = await this.postsRepository.preload({
-      id,
-      ...updatePostDto,
+  async update(
+    id: string,
+    updatePostDto: UpdatePostDto,
+    user: User,
+  ): Promise<{ post: Post | null; error: string | null } | null> {
+    const postToUpdate = await this.postsRepository.findOne({
+      where: {
+        id,
+      },
+      select: {
+        userId: true,
+        title: true,
+        content: true,
+      },
     });
-    if (!updatedPost) {
+
+    if (!postToUpdate) {
       return null;
     }
-    return this.postsRepository.save(updatedPost);
+
+    if (user.id !== postToUpdate.userId) {
+      return {
+        post: null,
+        error: "This post isn't owned by user",
+      };
+    }
+
+    const updatedPost = await this.postsRepository.save({
+      ...postToUpdate,
+      ...updatePostDto,
+    });
+
+    return {
+      post: updatedPost,
+      error: null,
+    };
   }
 
   async remove(id: string): Promise<Post | null> {

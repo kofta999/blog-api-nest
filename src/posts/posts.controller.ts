@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto, createPostSchema } from './dto/create-post.dto';
@@ -55,13 +56,18 @@ export class PostsController {
   async update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updatePostSchema)) updatePostDto: UpdatePostDto,
+    @User() user: UserEntity,
   ) {
-    const post = await this.postsService.update(id, updatePostDto);
-    if (!post) {
+    const result = await this.postsService.update(id, updatePostDto, user);
+    if (!result) {
       throw new NotFoundException(`Post with ID: ${id} is not found`);
     }
 
-    return post;
+    if (result.error) {
+      throw new UnauthorizedException(result.error);
+    }
+
+    return { post: result.post };
   }
 
   @Delete(':id')

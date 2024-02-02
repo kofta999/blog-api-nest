@@ -1,10 +1,10 @@
 Here's a high-level overview of the features I might want to implement:
 
-1. **User Authentication**: Users should be able to register and log in. Implemented, only refresh tokens and logout remains 
+1. **User Authentication**: Users should be able to register and log in. Implemented, only refresh tokens and logout remains
 
-2. **Post Creation**: Authenticated users should be able to create a new blog post. Each post would have a title, body, author (the authenticated user), and timestamps for creation and updates. Done, only timestamps remains
+2. **Post Creation**: Authenticated users should be able to create a new blog post. Each post would have a title, body, author (the authenticated user), and timestamps for creation and updates. Done
 
-3. **Post Retrieval**: Users should be able to retrieve posts. You might want to provide several endpoints for this, such as getting a single post by ID, getting all posts by a specific user, or getting all posts in the system.
+3. **Post Retrieval**: Users should be able to retrieve posts. You might want to provide several endpoints for this, such as getting a single post by ID, getting all posts by a specific user, or getting all posts in the system. Done
 
 4. **Post Update**: Authenticated users should be able to update their own posts.
 
