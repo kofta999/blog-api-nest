@@ -6,9 +6,9 @@ Here's a high-level overview of the features I might want to implement:
 
 3. **Post Retrieval**: Users should be able to retrieve posts. You might want to provide several endpoints for this, such as getting a single post by ID, getting all posts by a specific user, or getting all posts in the system. Done
 
-4. **Post Update**: Authenticated users should be able to update their own posts.
+4. **Post Update**: Authenticated users should be able to update their own posts. Done
 
-5. **Post Deletion**: Authenticated users should be able to delete their own posts.
+5. **Post Deletion**: Authenticated users should be able to delete their own posts. Done
 
 6. **Comments**: Users should be able to comment on posts. Like posts, comments would have an author and timestamps. You might also want to allow users to update and delete their own comments.
 

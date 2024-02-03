@@ -80,12 +80,35 @@ export class PostsService {
     };
   }
 
-  async remove(id: string): Promise<Post | null> {
-    const existingPost = await this.postsRepository.findOneBy({ id });
+  async remove(
+    id: string,
+    user: User,
+  ): Promise<{ post: Post | null; error: string | null } | null> {
+    const existingPost = await this.postsRepository.findOne({
+      where: {
+        id,
+      },
+      select: {
+        userId: true,
+      },
+    });
+
     if (!existingPost) {
       return null;
     }
+
+    if (user.id !== existingPost.userId) {
+      return {
+        post: null,
+        error: "This post isn't owned by user",
+      };
+    }
+
     await this.postsRepository.delete({ id });
-    return existingPost;
+
+    return {
+      post: existingPost,
+      error: null,
+    };
   }
 }

@@ -8,6 +8,7 @@ import {
   Put,
   NotFoundException,
   UnauthorizedException,
+  HttpCode,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto, createPostSchema } from './dto/create-post.dto';
@@ -71,11 +72,15 @@ export class PostsController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    const post = await this.postsService.remove(id);
-    if (!post) {
+  @HttpCode(204)
+  async remove(@Param('id') id: string, @User() user: UserEntity) {
+    const result = await this.postsService.remove(id, user);
+    if (!result) {
       throw new NotFoundException(`Post with ID: ${id} is not found`);
     }
-    return post;
+    if (result.error) {
+      throw new UnauthorizedException(result.error);
+    }
+    return { post: result.post };
   }
 }
