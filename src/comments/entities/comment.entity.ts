@@ -1,34 +1,33 @@
-import { Comment } from 'src/comments/entities/comment.entity';
+import { Post } from 'src/posts/entities/post.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
-export class Post {
+export class Comment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 100 })
-  title: string;
-
-  @Column('text')
+  @Column()
   content: string;
 
-  @ManyToOne(() => User, (user) => user.posts)
+  @ManyToOne(() => User, (user) => user.comments)
   user: User;
 
-  @Column({ select: false })
+  @Column()
   userId: string;
 
-  @OneToMany(() => Comment, (comment) => comment.post)
-  comments: Comment[];
+  @ManyToOne(() => Post, (post) => post.comments)
+  post: Post;
+
+  @Column()
+  postId: string;
 
   @CreateDateColumn()
   createdAt: Date;

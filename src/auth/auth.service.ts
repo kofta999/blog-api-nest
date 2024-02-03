@@ -7,6 +7,6 @@ export class AuthService {
   constructor(private jwtService: JwtService) {}
 
   async createToken(payload: JwtPayload): Promise<string> {
-    return await this.jwtService.signAsync(payload);
+    return await this.jwtService.signAsync(payload, { expiresIn: '1h' });
   }
 }

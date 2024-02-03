@@ -8,6 +8,7 @@ import { PostsModule } from './posts/posts.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
+import { CommentsModule } from './comments/comments.module';
 import config from './config/keys';
 
 @Module({
@@ -18,6 +19,7 @@ import config from './config/keys';
     UsersModule,
     PostsModule,
     AuthModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthService],
