@@ -27,7 +27,7 @@ export class Post {
   @Column({ select: false })
   userId: string;
 
-  @OneToMany(() => Comment, (comment) => comment.post)
+  @OneToMany(() => Comment, (comment) => comment.post, { onDelete: 'CASCADE' })
   comments: Comment[];
 
   @CreateDateColumn()

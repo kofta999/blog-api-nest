@@ -52,7 +52,17 @@ export class CommentsService {
     return this.commentsRepository.save(existingComment);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  async remove(id: string, user: User) {
+    const existingComment = await this.commentsRepository.findOne({
+      where: { id },
+    });
+    if (!existingComment) return null;
+
+    if (user.id !== existingComment.userId) {
+      throw new Error('Unauthorized');
+    }
+
+    await this.commentsRepository.delete({ id });
+    return existingComment;
   }
 }
