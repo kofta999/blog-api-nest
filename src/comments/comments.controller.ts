@@ -6,8 +6,6 @@ import {
   Param,
   Delete,
   Put,
-  NotFoundException,
-  ForbiddenException,
   HttpCode,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
@@ -42,52 +40,18 @@ export class CommentsController {
   }
 
   @Put(':commentId')
-  async update(
+  update(
     @Body(new ZodValidationPipe(createCommentSchema))
     updateCommentDto: UpdateCommentDto,
     @Param('commentId') commentId: string,
     @User() user: UserEntity,
   ) {
-    try {
-      const comment = await this.commentsService.update(
-        commentId,
-        updateCommentDto,
-        user,
-      );
-
-      if (!comment) {
-        throw new NotFoundException('Comment not found');
-      }
-
-      return comment;
-    } catch (error) {
-      if (error.message === 'Unauthorized') {
-        throw new ForbiddenException("This comment isn't owned by user");
-      } else {
-        throw error;
-      }
-    }
+    return this.commentsService.update(commentId, updateCommentDto, user);
   }
 
   @Delete(':commentId')
   @HttpCode(204)
-  async remove(
-    @Param('commentId') commentId: string,
-    @User() user: UserEntity,
-  ) {
-    try {
-      const comment = await this.commentsService.remove(commentId, user);
-      console.log(comment);
-
-      if (comment == null) {
-        throw new NotFoundException('Comment not found');
-      }
-    } catch (error) {
-      if (error.message === 'Unauthorized') {
-        throw new ForbiddenException("This comment isn't owned by user");
-      } else {
-        throw error;
-      }
-    }
+  remove(@Param('commentId') commentId: string, @User() user: UserEntity) {
+    return this.commentsService.remove(commentId, user);
   }
 }

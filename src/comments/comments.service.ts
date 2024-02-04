@@ -4,7 +4,8 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { User } from 'src/users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
-import { Repository } from 'typeorm';
+import { EntityNotFoundError, Repository } from 'typeorm';
+import { NotPermittedError } from 'src/errors/not-permitted.error';
 
 @Injectable()
 export class CommentsService {
@@ -37,14 +38,16 @@ export class CommentsService {
     id: string,
     updateCommentDto: UpdateCommentDto,
     user: User,
-  ): Promise<Comment | null> {
+  ): Promise<Comment> {
     const existingComment = await this.commentsRepository.findOne({
       where: { id },
     });
-    if (!existingComment) return null;
+    if (!existingComment) {
+      throw new EntityNotFoundError(Comment, 'Comment not found');
+    }
 
     if (user.id !== existingComment.userId) {
-      throw new Error('Unauthorized');
+      throw new NotPermittedError("This comment isn't owned by user");
     }
 
     existingComment.content = updateCommentDto.content;
@@ -52,17 +55,19 @@ export class CommentsService {
     return this.commentsRepository.save(existingComment);
   }
 
-  async remove(id: string, user: User) {
+  async remove(id: string, user: User): Promise<void> {
     const existingComment = await this.commentsRepository.findOne({
       where: { id },
     });
-    if (!existingComment) return null;
+
+    if (!existingComment) {
+      throw new EntityNotFoundError(Comment, 'Comment not found');
+    }
 
     if (user.id !== existingComment.userId) {
-      throw new Error('Unauthorized');
+      throw new NotPermittedError("This comment is'nt owned by user");
     }
 
     await this.commentsRepository.delete({ id });
-    return existingComment;
   }
 }
