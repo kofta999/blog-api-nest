@@ -3,9 +3,11 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
+  NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import {
@@ -38,14 +40,30 @@ export class CommentsController {
     return this.commentsService.findAll(postId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentsService.findOne(+id);
-  }
+  @Put(':commentId')
+  update(
+    @Body(new ZodValidationPipe(createCommentSchema))
+    updateCommentDto: UpdateCommentDto,
+    @Param('commentId') commentId: string,
+    @User() user: UserEntity,
+  ) {
+    try {
+      const comment = this.commentsService.update(
+        commentId,
+        updateCommentDto,
+        user,
+      );
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentsService.update(+id, updateCommentDto);
+      if (!comment) {
+        throw new NotFoundException('Comment not found');
+      }
+
+      return comment;
+    } catch (error) {
+      if (error.message === 'Unauthorized') {
+        throw new ForbiddenException("This comment isn't owned by user");
+      }
+    }
   }
 
   @Delete(':id')

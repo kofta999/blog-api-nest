@@ -7,8 +7,8 @@ import {
   Delete,
   Put,
   NotFoundException,
-  UnauthorizedException,
   HttpCode,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto, createPostSchema } from './dto/create-post.dto';
@@ -65,7 +65,7 @@ export class PostsController {
     }
 
     if (result.error) {
-      throw new UnauthorizedException(result.error);
+      throw new ForbiddenException(result.error);
     }
 
     return { post: result.post };
@@ -79,7 +79,7 @@ export class PostsController {
       throw new NotFoundException(`Post with ID: ${id} is not found`);
     }
     if (result.error) {
-      throw new UnauthorizedException(result.error);
+      throw new ForbiddenException(result.error);
     }
     return { post: result.post };
   }

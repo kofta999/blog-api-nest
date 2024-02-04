@@ -33,12 +33,23 @@ export class CommentsService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
-  }
+  async update(
+    id: string,
+    updateCommentDto: UpdateCommentDto,
+    user: User,
+  ): Promise<Comment | null> {
+    const existingComment = await this.commentsRepository.findOne({
+      where: { id },
+    });
+    if (!existingComment) return null;
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
+    if (user.id !== existingComment.userId) {
+      throw new Error('Unauthorized');
+    }
+
+    existingComment.content = updateCommentDto.content;
+
+    return this.commentsRepository.save(existingComment);
   }
 
   remove(id: number) {
