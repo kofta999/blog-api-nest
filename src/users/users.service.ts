@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthService } from 'src/auth/auth.service';
+import { ServiceError, ServiceErrorKey } from 'src/errors/service.error';
 
 @Injectable()
 export class UsersService {
@@ -14,8 +15,8 @@ export class UsersService {
     private authService: AuthService,
   ) {}
 
-  async findOne(id: string): Promise<User | null> {
-    return this.userRepository.findOne({
+  async findOne(id: string): Promise<User> {
+    const user = await this.userRepository.findOne({
       where: {
         id,
       },
@@ -23,9 +24,15 @@ export class UsersService {
         id: true,
       },
     });
+
+    if (!user) {
+      throw new ServiceError(ServiceErrorKey.NotFound);
+    }
+
+    return user;
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> | null {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     const currentUser = await this.userRepository.findOne({
       where: {
         email: createUserDto.email,
@@ -34,7 +41,7 @@ export class UsersService {
     });
 
     if (currentUser) {
-      return null;
+      throw new ServiceError(ServiceErrorKey.AlreadyExists);
     }
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
@@ -48,9 +55,7 @@ export class UsersService {
     return user;
   }
 
-  async login(
-    loginUserDto: LoginUserDto,
-  ): Promise<{ accessToken: string | null; error: string | null }> | null {
+  async login(loginUserDto: LoginUserDto): Promise<string> {
     const currentUser = await this.userRepository.findOne({
       where: [
         { email: loginUserDto.email },
@@ -59,7 +64,7 @@ export class UsersService {
     });
 
     if (!currentUser) {
-      return null;
+      throw new ServiceError(ServiceErrorKey.NotFound);
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -68,16 +73,11 @@ export class UsersService {
     );
 
     if (!isPasswordValid) {
-      // return ?
-      return { accessToken: null, error: 'Password Invalid' };
+      throw new ServiceError(ServiceErrorKey.WrongPassword);
     }
 
-    // create jwt and return
     const payload = { sub: currentUser.id, username: currentUser.username };
 
-    return {
-      accessToken: await this.authService.createToken(payload),
-      error: null,
-    };
+    return this.authService.createToken(payload);
   }
 }

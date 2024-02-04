@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { EntityNotFoundError, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { NotPermittedError } from 'src/errors/not-permitted.error';
+import { ServiceError, ServiceErrorKey } from 'src/errors/service.error';
 
 @Injectable()
 export class PostsService {
@@ -33,7 +33,7 @@ export class PostsService {
     const post = await this.postsRepository.findOneBy({ id });
 
     if (!post) {
-      throw new EntityNotFoundError(Post, 'Post not found');
+      throw new ServiceError(ServiceErrorKey.NotFound);
     }
 
     return post;
@@ -64,11 +64,11 @@ export class PostsService {
     });
 
     if (!postToUpdate) {
-      throw new EntityNotFoundError(Post, 'Post not found');
+      throw new ServiceError(ServiceErrorKey.NotFound);
     }
 
     if (user.id !== postToUpdate.userId) {
-      throw new NotPermittedError('This post is for another user');
+      throw new ServiceError(ServiceErrorKey.Forbidden);
     }
 
     const updatedPost = await this.postsRepository.save({
@@ -90,11 +90,11 @@ export class PostsService {
     });
 
     if (!existingPost) {
-      throw new EntityNotFoundError(Post, 'Post not found');
+      throw new ServiceError(ServiceErrorKey.NotFound);
     }
 
     if (user.id !== existingPost.userId) {
-      throw new NotPermittedError('This post is for another user');
+      throw new ServiceError(ServiceErrorKey.Forbidden);
     }
 
     await this.postsRepository.delete({ id });

@@ -1,13 +1,4 @@
-import {
-  Body,
-  ConflictException,
-  Controller,
-  HttpCode,
-  NotFoundException,
-  Post,
-  UnauthorizedException,
-  UsePipes,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, UsePipes } from '@nestjs/common';
 import { CreateUserDto, createUserSchema } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { ZodValidationPipe } from 'src/pipes/validation.pipe';
@@ -21,31 +12,15 @@ export class UsersController {
   @Post('/register')
   @Public()
   @UsePipes(new ZodValidationPipe(createUserSchema))
-  async register(@Body() createUserDto: CreateUserDto) {
-    const user = await this.usersService.create(createUserDto);
-
-    if (!user)
-      throw new ConflictException('User already exists, please log in instead');
-
-    return user;
+  register(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
   }
 
   @Post('/login')
   @HttpCode(200)
   @Public()
   @UsePipes(new ZodValidationPipe(loginUserSchema))
-  async login(@Body() loginUserDto: LoginUserDto) {
-    const result = await this.usersService.login(loginUserDto);
-
-    if (!result) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (result.error) {
-      throw new UnauthorizedException(result.error);
-    }
-
-    delete result.error;
-    return result;
+  login(@Body() loginUserDto: LoginUserDto) {
+    return this.usersService.login(loginUserDto);
   }
 }

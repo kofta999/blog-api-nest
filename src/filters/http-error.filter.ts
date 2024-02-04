@@ -6,22 +6,18 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { NotPermittedError } from 'src/errors/not-permitted.error';
-import { EntityNotFoundError } from 'typeorm';
+import { ServiceError } from 'src/errors/service.error';
 
 @Catch()
 export class HttpErrorFilter implements ExceptionFilter {
-  catch(exception: Error, host: ArgumentsHost) {
+  catch(exception: Error | ServiceError | HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal Server Error';
 
-    if (exception instanceof EntityNotFoundError) {
-      status = HttpStatus.NOT_FOUND;
-      message = exception.criteria;
-    } else if (exception instanceof NotPermittedError) {
-      status = HttpStatus.FORBIDDEN;
+    if (exception instanceof ServiceError) {
+      status = exception.statusCode;
       message = exception.message;
     } else if (exception instanceof HttpException) {
       status = exception.getStatus();

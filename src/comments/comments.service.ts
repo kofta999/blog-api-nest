@@ -4,8 +4,8 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { User } from 'src/users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
-import { EntityNotFoundError, Repository } from 'typeorm';
-import { NotPermittedError } from 'src/errors/not-permitted.error';
+import { Repository } from 'typeorm';
+import { ServiceError, ServiceErrorKey } from 'src/errors/service.error';
 
 @Injectable()
 export class CommentsService {
@@ -43,11 +43,11 @@ export class CommentsService {
       where: { id },
     });
     if (!existingComment) {
-      throw new EntityNotFoundError(Comment, 'Comment not found');
+      throw new ServiceError(ServiceErrorKey.NotFound);
     }
 
     if (user.id !== existingComment.userId) {
-      throw new NotPermittedError("This comment isn't owned by user");
+      throw new ServiceError(ServiceErrorKey.Forbidden);
     }
 
     existingComment.content = updateCommentDto.content;
@@ -61,11 +61,11 @@ export class CommentsService {
     });
 
     if (!existingComment) {
-      throw new EntityNotFoundError(Comment, 'Comment not found');
+      throw new ServiceError(ServiceErrorKey.NotFound);
     }
 
     if (user.id !== existingComment.userId) {
-      throw new NotPermittedError("This comment is'nt owned by user");
+      throw new ServiceError(ServiceErrorKey.Forbidden);
     }
 
     await this.commentsRepository.delete({ id });
