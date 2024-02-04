@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Repository } from 'typeorm';
+import { EntityNotFoundError, Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
+import { NotPermittedError } from 'src/errors/not-permitted.error';
 
 @Injectable()
 export class PostsService {
@@ -16,22 +17,26 @@ export class PostsService {
     const post = new Post();
     post.content = createPostDto.content;
     post.title = createPostDto.title;
-    post.user = user;
+    post.userId = user.id;
 
-    const newPost = await this.postsRepository.save(post);
-    if (newPost && newPost.user) {
-      delete newPost.user;
-    }
+    await this.postsRepository.save(post);
 
-    return newPost;
+    return post;
   }
 
   async findAll(): Promise<Post[]> {
+    // TODO: Add pagination
     return this.postsRepository.find();
   }
 
-  async findOne(id: string): Promise<Post | null> {
-    return this.postsRepository.findOneBy({ id });
+  async findOne(id: string): Promise<Post> {
+    const post = await this.postsRepository.findOneBy({ id });
+
+    if (!post) {
+      throw new EntityNotFoundError(Post, 'Post not found');
+    }
+
+    return post;
   }
 
   async findByUser(userId: string): Promise<Post[]> {
@@ -46,7 +51,7 @@ export class PostsService {
     id: string,
     updatePostDto: UpdatePostDto,
     user: User,
-  ): Promise<{ post: Post | null; error: string | null } | null> {
+  ): Promise<Post> {
     const postToUpdate = await this.postsRepository.findOne({
       where: {
         id,
@@ -59,14 +64,11 @@ export class PostsService {
     });
 
     if (!postToUpdate) {
-      return null;
+      throw new EntityNotFoundError(Post, 'Post not found');
     }
 
     if (user.id !== postToUpdate.userId) {
-      return {
-        post: null,
-        error: "This post isn't owned by user",
-      };
+      throw new NotPermittedError('This post is for another user');
     }
 
     const updatedPost = await this.postsRepository.save({
@@ -74,16 +76,10 @@ export class PostsService {
       ...updatePostDto,
     });
 
-    return {
-      post: updatedPost,
-      error: null,
-    };
+    return updatedPost;
   }
 
-  async remove(
-    id: string,
-    user: User,
-  ): Promise<{ post: Post | null; error: string | null } | null> {
+  async remove(id: string, user: User): Promise<void> {
     const existingPost = await this.postsRepository.findOne({
       where: {
         id,
@@ -94,21 +90,13 @@ export class PostsService {
     });
 
     if (!existingPost) {
-      return null;
+      throw new EntityNotFoundError(Post, 'Post not found');
     }
 
     if (user.id !== existingPost.userId) {
-      return {
-        post: null,
-        error: "This post isn't owned by user",
-      };
+      throw new NotPermittedError('This post is for another user');
     }
 
     await this.postsRepository.delete({ id });
-
-    return {
-      post: existingPost,
-      error: null,
-    };
   }
 }

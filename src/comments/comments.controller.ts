@@ -9,8 +9,6 @@ import {
   NotFoundException,
   ForbiddenException,
   HttpCode,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import {
@@ -72,6 +70,7 @@ export class CommentsController {
   }
 
   @Delete(':commentId')
+  @HttpCode(204)
   async remove(
     @Param('commentId') commentId: string,
     @User() user: UserEntity,
@@ -83,8 +82,6 @@ export class CommentsController {
       if (comment == null) {
         throw new NotFoundException('Comment not found');
       }
-
-      throw new HttpException('', HttpStatus.NO_CONTENT);
     } catch (error) {
       if (error.message === 'Unauthorized') {
         throw new ForbiddenException("This comment isn't owned by user");

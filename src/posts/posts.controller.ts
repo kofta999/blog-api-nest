@@ -6,9 +6,7 @@ import {
   Param,
   Delete,
   Put,
-  NotFoundException,
   HttpCode,
-  ForbiddenException,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto, createPostSchema } from './dto/create-post.dto';
@@ -45,42 +43,21 @@ export class PostsController {
   @Public()
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const post = await this.postsService.findOne(id);
-    if (!post) {
-      throw new NotFoundException(`Post with ID: ${id} is not found`);
-    }
-
-    return post;
+    return await this.postsService.findOne(id);
   }
 
   @Put(':id')
-  async update(
+  update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updatePostSchema)) updatePostDto: UpdatePostDto,
     @User() user: UserEntity,
   ) {
-    const result = await this.postsService.update(id, updatePostDto, user);
-    if (!result) {
-      throw new NotFoundException(`Post with ID: ${id} is not found`);
-    }
-
-    if (result.error) {
-      throw new ForbiddenException(result.error);
-    }
-
-    return { post: result.post };
+    return this.postsService.update(id, updatePostDto, user);
   }
 
   @Delete(':id')
   @HttpCode(204)
   async remove(@Param('id') id: string, @User() user: UserEntity) {
-    const result = await this.postsService.remove(id, user);
-    if (!result) {
-      throw new NotFoundException(`Post with ID: ${id} is not found`);
-    }
-    if (result.error) {
-      throw new ForbiddenException(result.error);
-    }
-    return { post: result.post };
+    return this.postsService.remove(id, user);
   }
 }

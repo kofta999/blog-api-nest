@@ -21,13 +21,13 @@ export class Post {
   @Column('text')
   content: string;
 
-  @ManyToOne(() => User, (user) => user.posts)
+  @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
   user: User;
 
   @Column({ select: false })
   userId: string;
 
-  @OneToMany(() => Comment, (comment) => comment.post, { onDelete: 'CASCADE' })
+  @OneToMany(() => Comment, (comment) => comment.post)
   comments: Comment[];
 
   @CreateDateColumn()
