@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ServiceError } from 'src/errors/service.error';
+import { ServiceError } from 'src/shared/errors/service.error';
 
 @Catch()
 export class HttpErrorFilter implements ExceptionFilter {

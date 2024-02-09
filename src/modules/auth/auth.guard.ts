@@ -11,7 +11,7 @@ import { Request } from 'express';
 import keys from 'src/config/keys';
 import { IS_PUBLIC_KEY } from './decorators/public.decorator';
 import { JwtPayload } from './interfaces/jwtPayload.interface';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from 'src/modules/users/users.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

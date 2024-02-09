@@ -5,8 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { LoginUserDto } from './dto/login-user.dto';
-import { AuthService } from 'src/auth/auth.service';
-import { ServiceError, ServiceErrorKey } from 'src/errors/service.error';
+import { AuthService } from 'src/modules/auth/auth.service';
+import { ServiceError, ServiceErrorKey } from 'src/shared/errors/service.error';
 
 @Injectable()
 export class UsersService {

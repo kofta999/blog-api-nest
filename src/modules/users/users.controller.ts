@@ -1,9 +1,9 @@
 import { Body, Controller, HttpCode, Post, UsePipes } from '@nestjs/common';
 import { CreateUserDto, createUserSchema } from './dto/create-user.dto';
 import { UsersService } from './users.service';
-import { ZodValidationPipe } from 'src/pipes/validation.pipe';
+import { ZodValidationPipe } from 'src/shared/pipes/validation.pipe';
 import { LoginUserDto, loginUserSchema } from './dto/login-user.dto';
-import { Public } from 'src/auth/decorators/public.decorator';
+import { Public } from 'src/modules/auth/decorators/public.decorator';
 
 @Controller('users')
 export class UsersController {

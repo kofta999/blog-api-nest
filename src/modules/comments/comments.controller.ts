@@ -15,10 +15,10 @@ import {
   createCommentSchema,
 } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { User } from 'src/auth/decorators/user.decorator';
-import { User as UserEntity } from 'src/users/entities/user.entity';
-import { ZodValidationPipe } from 'src/pipes/validation.pipe';
-import { Public } from 'src/auth/decorators/public.decorator';
+import { User } from 'src/modules/auth/decorators/user.decorator';
+import { User as UserEntity } from 'src/modules/users/entities/user.entity';
+import { ZodValidationPipe } from 'src/shared/pipes/validation.pipe';
+import { Public } from 'src/modules/auth/decorators/public.decorator';
 
 @Controller('posts/:postId/comments')
 export class CommentsController {

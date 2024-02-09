@@ -12,10 +12,10 @@ import {
 import { PostsService } from './posts.service';
 import { CreatePostDto, createPostSchema } from './dto/create-post.dto';
 import { UpdatePostDto, updatePostSchema } from './dto/update-post.dto';
-import { ZodValidationPipe } from '../pipes/validation.pipe';
-import { Public } from 'src/auth/decorators/public.decorator';
-import { User } from 'src/auth/decorators/user.decorator';
-import { User as UserEntity } from 'src/users/entities/user.entity';
+import { ZodValidationPipe } from '../../shared/pipes/validation.pipe';
+import { Public } from 'src/modules/auth/decorators/public.decorator';
+import { User } from 'src/modules/auth/decorators/user.decorator';
+import { User as UserEntity } from 'src/modules/users/entities/user.entity';
 
 @Controller('posts')
 export class PostsController {

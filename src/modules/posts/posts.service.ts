@@ -4,9 +4,9 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { ServiceError, ServiceErrorKey } from 'src/errors/service.error';
-import { FindAllResource } from 'src/interfaces/FindAllResource';
+import { User } from 'src/modules/users/entities/user.entity';
+import { ServiceError, ServiceErrorKey } from 'src/shared/errors/service.error';
+import { FindAllResource } from 'src/shared/interfaces/FindAllResource';
 
 @Injectable()
 export class PostsService {

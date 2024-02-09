@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
 import { Repository } from 'typeorm';
-import { ServiceError, ServiceErrorKey } from 'src/errors/service.error';
-import { FindAllResource } from 'src/interfaces/FindAllResource';
+import { ServiceError, ServiceErrorKey } from 'src/shared/errors/service.error';
+import { FindAllResource } from 'src/shared/interfaces/FindAllResource';
 
 @Injectable()
 export class CommentsService {
