@@ -33,26 +33,18 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const currentUser = await this.userRepository.findOne({
-      where: {
-        email: createUserDto.email,
-        username: createUserDto.username,
-      },
-    });
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    if (currentUser) {
+    try {
+      const user = await this.userRepository.save({
+        ...createUserDto,
+        password: hashedPassword,
+      });
+      if (user && user.password) delete user.password;
+      return user;
+    } catch (e) {
       throw new ServiceError(ServiceErrorKey.AlreadyExists);
     }
-
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const user = await this.userRepository.save({
-      ...createUserDto,
-      password: hashedPassword,
-    });
-
-    if (user && user.password) delete user.password;
-
-    return user;
   }
 
   async login(loginUserDto: LoginUserDto): Promise<string> {
