@@ -2,16 +2,14 @@ Here's a high-level overview of the features I might want to implement:
 
 1. **User Authentication**: Users should be able to register and log in. Implemented, only refresh tokens and logout remains
 
-2. **Post Creation**: Authenticated users should be able to create a new blog post. Each post would have a title, body, author (the authenticated user), and timestamps for creation and updates. Done
+2. **Likes**: Users should be able to "like" posts. You'll need to keep track of which users have liked which posts to prevent a user from liking a post multiple times.
 
-3. **Post Retrieval**: Users should be able to retrieve posts. You might want to provide several endpoints for this, such as getting a single post by ID, getting all posts by a specific user, or getting all posts in the system. Done
+3. **Search with Pagination**: Users should be able to search for posts and the results should be paginated. This will involve adding a search endpoint to your API and implementing pagination for the search results.
 
-4. **Post Update**: Authenticated users should be able to update their own posts. Done
+4. **Followings**: Users should be able to follow other users. You'll need to keep track of which users are following which users. This will involve adding endpoints to your API for following and unfollowing users, and for getting a user's followers and followings.
 
-5. **Post Deletion**: Authenticated users should be able to delete their own posts. Done
+5. **Bookmarks**: Users should be able to bookmark posts. You'll need to keep track of which users have bookmarked which posts. This will involve adding endpoints to your API for bookmarking and unbookmarking posts, and for getting a user's bookmarked posts.
 
-6. **Comments**: Users should be able to comment on posts. Like posts, comments would have an author and timestamps. You might also want to allow users to update and delete their own comments.
+6. **User Details**: Users should be able to add more details to their profile, such as a profile picture. This will involve adding endpoints to your API for updating a user's profile and for uploading a profile picture.
 
-7. **Likes**: Users should be able to "like" posts. You'll need to keep track of which users have liked which posts to prevent a user from liking a post multiple times.
-
-Remember to use NestJS's features effectively. For example, you can use Modules to organize your code into the User, Post, and Comment modules. You can use Guards to protect routes that should only be accessible to authenticated users. You can use Interceptors to transform the response data before sending it to the user.
+7. **File Uploads**: Users should be able to upload files. This will involve adding an endpoint to your API for file uploads. You'll need to handle storing the uploaded files and serving them when requested.
