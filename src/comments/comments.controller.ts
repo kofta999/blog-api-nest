@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import {
@@ -35,8 +36,12 @@ export class CommentsController {
 
   @Get()
   @Public()
-  findAll(@Param('postId') postId: string) {
-    return this.commentsService.findAll(postId);
+  findAll(
+    @Param('postId') postId: string,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
+    return this.commentsService.findAll(postId, page, limit);
   }
 
   @Put(':commentId')

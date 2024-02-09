@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto, createPostSchema } from './dto/create-post.dto';
@@ -30,8 +31,8 @@ export class PostsController {
 
   @Public()
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  findAll(@Query('page') page: number, @Query('limit') limit: number) {
+    return this.postsService.findAll(page, limit);
   }
 
   @Public()

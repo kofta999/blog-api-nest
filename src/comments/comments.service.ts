@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
 import { Repository } from 'typeorm';
 import { ServiceError, ServiceErrorKey } from 'src/errors/service.error';
+import { FindAllResource } from 'src/interfaces/FindAllResource';
 
 @Injectable()
 export class CommentsService {
@@ -26,12 +27,35 @@ export class CommentsService {
     return this.commentsRepository.save(comment);
   }
 
-  async findAll(postId: string) {
-    return this.commentsRepository.find({
+  async findAll(
+    postId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<FindAllResource<Comment>> {
+    page = Math.max(1, page);
+    limit = Math.max(1, limit);
+
+    const [data, total] = await this.commentsRepository.findAndCount({
       where: {
         postId,
       },
+      take: limit,
+      skip: (page - 1) * limit,
+      order: {
+        createdAt: 'DESC',
+      },
     });
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      totalPages,
+      limit,
+      currPage: page,
+      nextPage: page === totalPages ? null : page + 1,
+      prevPage: page === 1 ? null : page - 1,
+    };
   }
 
   async update(

@@ -7,7 +7,7 @@ import {
 import { Observable, map } from 'rxjs';
 
 export interface Response<T> {
-  data: T;
+  results: T;
 }
 
 @Injectable()
@@ -18,6 +18,6 @@ export class TransformInterceptor<T>
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<Response<T>> {
-    return next.handle().pipe(map((data) => ({ data })));
+    return next.handle().pipe(map((results) => ({ results })));
   }
 }

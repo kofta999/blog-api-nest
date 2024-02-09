@@ -6,6 +6,7 @@ import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { ServiceError, ServiceErrorKey } from 'src/errors/service.error';
+import { FindAllResource } from 'src/interfaces/FindAllResource';
 
 @Injectable()
 export class PostsService {
@@ -24,9 +25,29 @@ export class PostsService {
     return post;
   }
 
-  async findAll(): Promise<Post[]> {
-    // TODO: Add pagination
-    return this.postsRepository.find();
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<FindAllResource<Post>> {
+    page = Math.max(1, page);
+    limit = Math.max(1, limit);
+
+    const [data, total] = await this.postsRepository.findAndCount({
+      take: limit,
+      skip: (page - 1) * limit,
+      order: { createdAt: 'DESC' },
+    });
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      totalPages,
+      limit,
+      currPage: page,
+      nextPage: page === totalPages ? null : page + 1,
+      prevPage: page === 1 ? null : page - 1,
+    };
   }
 
   async findOne(id: string): Promise<Post> {
