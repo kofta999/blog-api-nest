@@ -1,3 +1,4 @@
+import { RefreshToken } from 'src/modules/auth/entities/refreshToken.entity';
 import { Comment } from 'src/modules/comments/entities/comment.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -24,4 +25,7 @@ export class User {
 
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  refreshTokens: RefreshToken[];
 }

@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { createUserSchema } from './create-user.dto';
+import { registerSchema } from './register.dto';
 
-const createUserShape = createUserSchema.shape;
-export const loginUserSchema = z
+const createUserShape = registerSchema.shape;
+export const loginSchema = z
   .object({
     email: createUserShape.email.optional(),
     username: createUserShape.username.optional(),
@@ -12,4 +12,4 @@ export const loginUserSchema = z
     message: 'Only email or username should be provided, not both',
   });
 
-export type LoginUserDto = z.infer<typeof loginUserSchema>;
+export type LoginDto = z.infer<typeof loginSchema>;

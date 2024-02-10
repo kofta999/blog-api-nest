@@ -1,27 +1,22 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-// import { MongooseModule } from '@nestjs/mongoose';
-// import { ItemsModule } from './items/items.module';
 import { UsersModule } from './modules/users/users.module';
 import { PostsModule } from './modules/posts/posts.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthService } from './modules/auth/auth.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import config from './config/keys';
 
 @Module({
   imports: [
-    // ItemsModule,
     TypeOrmModule.forRoot(config.sqlConfig),
-    // MongooseModule.forRoot(config.mongoURI),
+    AuthModule,
     UsersModule,
     PostsModule,
-    AuthModule,
     CommentsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService],
+  providers: [AppService],
 })
 export class AppModule {}
