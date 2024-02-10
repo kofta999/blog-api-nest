@@ -19,8 +19,24 @@ export class AuthService {
     private refreshTokenRepository: Repository<RefreshToken>,
   ) {}
 
-  async createToken(payload: JwtPayload): Promise<string> {
-    return await this.jwtService.signAsync(payload, { expiresIn: '1h' });
+  async createToken(payload: JwtPayload, expiresIn: string): Promise<string> {
+    return this.jwtService.signAsync(payload, { expiresIn });
+  }
+
+  async createAccessToken(payload: JwtPayload): Promise<string> {
+    return this.createToken(payload, '1h');
+  }
+
+  async createRefreshToken(payload: JwtPayload): Promise<string> {
+    const refreshToken = new RefreshToken();
+    const token = await this.createToken(payload, '30d');
+
+    refreshToken.token = await bcrypt.hash(token, 10);
+    refreshToken.userId = payload.sub;
+
+    await this.refreshTokenRepository.save(refreshToken);
+
+    return token;
   }
 
   async register(createUserDto: RegisterDto): Promise<User> {
@@ -38,7 +54,9 @@ export class AuthService {
     }
   }
 
-  async login(loginUserDto: LoginDto): Promise<string> {
+  async login(
+    loginUserDto: LoginDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const currentUser = await this.userRepository.findOne({
       where: [
         { email: loginUserDto.email },
@@ -61,6 +79,9 @@ export class AuthService {
 
     const payload = { sub: currentUser.id, username: currentUser.username };
 
-    return this.createToken(payload);
+    return {
+      accessToken: await this.createAccessToken(payload),
+      refreshToken: await this.createRefreshToken(payload),
+    };
   }
 }
