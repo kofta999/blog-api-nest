@@ -1,9 +1,23 @@
-import { Body, Controller, HttpCode, Post, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UsePipes,
+} from '@nestjs/common';
 import { ZodValidationPipe } from 'src/shared/pipes/validation.pipe';
 import { RegisterDto, registerSchema } from './dto/register.dto';
 import { loginSchema, LoginDto } from './dto/login.dto';
 import { Public } from './decorators/public.decorator';
 import { AuthService } from './auth.service';
+import { Request, Response } from 'express';
+import keys from 'src/config/keys';
+import { User } from './decorators/user.decorator';
+import { User as UserEntity } from '../users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -19,7 +33,34 @@ export class AuthController {
   @HttpCode(200)
   @Public()
   @UsePipes(new ZodValidationPipe(loginSchema))
-  login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const tokens = await this.authService.login(loginDto);
+
+    response.cookie('refreshToken', tokens.refreshToken, {
+      maxAge: keys.cookieConfig.maxAge,
+      secure: true,
+      sameSite: 'none',
+      httpOnly: true,
+    });
+
+    return { accessToken: tokens.accessToken };
+  }
+
+  @Get('/logout')
+  logout(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+    @User() user: UserEntity,
+  ) {
+    const { refreshToken } = request.cookies;
+    response.clearCookie('refreshToken');
+
+    if (!refreshToken)
+      throw new UnauthorizedException('Refresh Token not found');
+
+    return this.authService.logout(refreshToken, user);
   }
 }

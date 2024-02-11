@@ -1,4 +1,3 @@
-import { JwtModuleOptions } from '@nestjs/jwt';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { RefreshToken } from 'src/modules/auth/entities/refreshToken.entity';
 import { Comment } from 'src/modules/comments/entities/comment.entity';
@@ -16,7 +15,12 @@ export default {
     entities: [Post, User, Comment, RefreshToken],
     synchronize: true, // not to be used in prod
   } satisfies TypeOrmModuleOptions,
-  jwtConfig: {
+  jwtModuleConfig: {
     secret: 'SECRET',
-  } satisfies JwtModuleOptions,
+    refreshSecret: 'REFRESH_SECRET',
+  },
+  cookieConfig: {
+    secret: 'COOKIE_SECRET',
+    maxAge: 60 * 60 * 24 * 1000,
+  },
 };
