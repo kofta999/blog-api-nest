@@ -72,6 +72,22 @@ export class AuthService {
     return this.verifyToken(token, keys.jwtModuleConfig.refreshSecret);
   }
 
+  private async refreshTokenReuseDetection(
+    userId: string,
+    token: string,
+  ): Promise<RefreshToken> {
+    const oldToken = await this.refreshTokenRepository.findOneBy({
+      token,
+    });
+
+    if (!oldToken) {
+      await this.refreshTokenRepository.delete({ userId });
+      throw new ServiceError(ServiceErrorKey.Unauthorized);
+    }
+
+    return oldToken;
+  }
+
   async register(createUserDto: RegisterDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = await this.userService.create({
@@ -116,28 +132,19 @@ export class AuthService {
   }
 
   async logout(refreshToken: string): Promise<void> {
-    const result = await this.refreshTokenRepository.delete({
-      token: refreshToken,
-    });
+    const { sub } = await this.verifyRefreshToken(refreshToken);
+    const token = await this.refreshTokenReuseDetection(sub, refreshToken);
 
-    if (result.affected === 0) {
-      throw new ServiceError(ServiceErrorKey.Unauthorized);
-    }
+    await this.refreshTokenRepository.remove(token);
   }
 
   async refreshTokens(refreshToken: string) {
     const { sub, username } = await this.verifyRefreshToken(refreshToken);
     const user = { sub, username };
+
+    const oldToken = await this.refreshTokenReuseDetection(sub, refreshToken);
     const accessToken = await this.createAccessToken(user);
     const newRefreshToken = await this.createRefreshToken(user);
-
-    const oldToken = await this.refreshTokenRepository.findOneBy({
-      token: refreshToken,
-    });
-
-    if (!oldToken) {
-      throw new ServiceError(ServiceErrorKey.Unauthorized);
-    }
 
     oldToken.token = newRefreshToken;
 

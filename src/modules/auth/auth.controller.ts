@@ -48,7 +48,7 @@ export class AuthController {
   }
 
   @Get('/logout')
-  logout(
+  async logout(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
@@ -58,7 +58,12 @@ export class AuthController {
     if (!refreshToken)
       throw new UnauthorizedException('Refresh Token not found');
 
-    return this.authService.logout(refreshToken);
+    try {
+      await this.authService.logout(refreshToken);
+    } catch (error) {
+      response.clearCookie('refreshToken');
+      throw new UnauthorizedException('Refresh token is stolen');
+    }
   }
 
   @Get('/refresh')
@@ -74,15 +79,20 @@ export class AuthController {
       throw new UnauthorizedException('Refresh Token not found');
     }
 
-    const tokens = await this.authService.refreshTokens(refreshToken);
+    try {
+      const tokens = await this.authService.refreshTokens(refreshToken);
 
-    response.cookie('refreshToken', tokens.newRefreshToken, {
-      maxAge: keys.cookieConfig.maxAge,
-      secure: true,
-      sameSite: 'none',
-      httpOnly: true,
-    });
+      response.cookie('refreshToken', tokens.newRefreshToken, {
+        maxAge: keys.cookieConfig.maxAge,
+        secure: true,
+        sameSite: 'none',
+        httpOnly: true,
+      });
 
-    return { accessToken: tokens.accessToken };
+      return { accessToken: tokens.accessToken };
+    } catch (error) {
+      response.clearCookie('refreshToken');
+      throw new UnauthorizedException('Refresh token is stolen');
+    }
   }
 }
