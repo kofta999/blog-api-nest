@@ -35,7 +35,7 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      const user = this.authService.verifyToken(token);
+      const user = await this.authService.verifyToken(token);
 
       if (!user) {
         throw new NotFoundException('User not found');

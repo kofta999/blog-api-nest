@@ -49,12 +49,16 @@ export class AuthService {
     return token;
   }
 
-  verifyToken(token: string): string {
-    const payload = this.jwtService.verify<JwtPayload>(token, {
-      secret: keys.jwtModuleConfig.secret,
-    });
+  async verifyToken(token: string): Promise<string> {
+    try {
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
+        secret: keys.jwtModuleConfig.secret,
+      });
 
-    return payload.sub;
+      return payload.sub;
+    } catch (e) {
+      throw new ServiceError(ServiceErrorKey.Unauthorized);
+    }
   }
 
   async register(createUserDto: RegisterDto): Promise<User> {
@@ -76,7 +80,7 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const currentUser = await this.userService.findOne(
       loginUserDto.email,
-      loginUserDto.password,
+      loginUserDto.username,
     );
 
     if (!currentUser) {
@@ -100,7 +104,13 @@ export class AuthService {
     };
   }
 
-  async logout(refreshToken: string) {
-    const currentUser = await this.verifyToken(refreshToken);
+  async logout(refreshToken: string): Promise<void> {
+    const result = await this.refreshTokenRepository.delete({
+      token: refreshToken,
+    });
+
+    if (result.affected === 0) {
+      throw new ServiceError(ServiceErrorKey.Unauthorized);
+    }
   }
 }

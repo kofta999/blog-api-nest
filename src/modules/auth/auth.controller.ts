@@ -16,8 +16,6 @@ import { Public } from './decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import keys from 'src/config/keys';
-import { User } from './decorators/user.decorator';
-import { User as UserEntity } from '../users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -53,14 +51,14 @@ export class AuthController {
   logout(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
-    @User() user: UserEntity,
   ) {
+    console.log(request.cookies);
     const { refreshToken } = request.cookies;
     response.clearCookie('refreshToken');
 
     if (!refreshToken)
       throw new UnauthorizedException('Refresh Token not found');
 
-    return this.authService.logout(refreshToken, user);
+    return this.authService.logout(refreshToken);
   }
 }
