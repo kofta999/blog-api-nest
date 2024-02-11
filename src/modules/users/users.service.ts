@@ -43,8 +43,4 @@ export class UsersService {
       ...createUserDto,
     });
   }
-
-  // async removeToken(userId: string, refreshToken: string) {
-  //   return this.userRepository.update(userId, {});
-  // }
 }

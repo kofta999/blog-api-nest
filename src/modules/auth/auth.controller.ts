@@ -52,7 +52,6 @@ export class AuthController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    console.log(request.cookies);
     const { refreshToken } = request.cookies;
     response.clearCookie('refreshToken');
 
@@ -60,5 +59,30 @@ export class AuthController {
       throw new UnauthorizedException('Refresh Token not found');
 
     return this.authService.logout(refreshToken);
+  }
+
+  @Get('/refresh')
+  @Public()
+  async refresh(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const { refreshToken } = request.cookies;
+
+    if (!refreshToken) {
+      response.clearCookie('refreshToken');
+      throw new UnauthorizedException('Refresh Token not found');
+    }
+
+    const tokens = await this.authService.refreshTokens(refreshToken);
+
+    response.cookie('refreshToken', tokens.newRefreshToken, {
+      maxAge: keys.cookieConfig.maxAge,
+      secure: true,
+      sameSite: 'none',
+      httpOnly: true,
+    });
+
+    return { accessToken: tokens.accessToken };
   }
 }

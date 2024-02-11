@@ -41,7 +41,7 @@ export class AuthService {
       keys.jwtModuleConfig.refreshSecret,
     );
 
-    refreshToken.token = await bcrypt.hash(token, 10);
+    refreshToken.token = token;
     refreshToken.userId = payload.sub;
 
     await this.refreshTokenRepository.save(refreshToken);
@@ -49,16 +49,27 @@ export class AuthService {
     return token;
   }
 
-  async verifyToken(token: string): Promise<string> {
+  private async verifyToken(
+    token: string,
+    secret: string,
+  ): Promise<JwtPayload> {
     try {
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
-        secret: keys.jwtModuleConfig.secret,
+        secret,
       });
 
-      return payload.sub;
+      return payload;
     } catch (e) {
       throw new ServiceError(ServiceErrorKey.Unauthorized);
     }
+  }
+
+  async verifyAccessToken(token: string): Promise<JwtPayload> {
+    return this.verifyToken(token, keys.jwtModuleConfig.secret);
+  }
+
+  async verifyRefreshToken(token: string): Promise<JwtPayload> {
+    return this.verifyToken(token, keys.jwtModuleConfig.refreshSecret);
   }
 
   async register(createUserDto: RegisterDto): Promise<User> {
@@ -112,5 +123,26 @@ export class AuthService {
     if (result.affected === 0) {
       throw new ServiceError(ServiceErrorKey.Unauthorized);
     }
+  }
+
+  async refreshTokens(refreshToken: string) {
+    const { sub, username } = await this.verifyRefreshToken(refreshToken);
+    const user = { sub, username };
+    const accessToken = await this.createAccessToken(user);
+    const newRefreshToken = await this.createRefreshToken(user);
+
+    const oldToken = await this.refreshTokenRepository.findOneBy({
+      token: refreshToken,
+    });
+
+    if (!oldToken) {
+      throw new ServiceError(ServiceErrorKey.Unauthorized);
+    }
+
+    oldToken.token = newRefreshToken;
+
+    await this.refreshTokenRepository.save(oldToken);
+
+    return { newRefreshToken, accessToken };
   }
 }
