@@ -1,6 +1,6 @@
 Here's a high-level overview of the features I might want to implement:
 
-1. **User Authentication**: Users should be able to register and log in. Implemented, only refresh tokens and logout remains
+1. **User Authentication**: Users should be able to register and log in. Done. 
 
 2. **Likes**: Users should be able to "like" posts. You'll need to keep track of which users have liked which posts to prevent a user from liking a post multiple times.
 

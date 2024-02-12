@@ -2,6 +2,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { RefreshToken } from 'src/modules/auth/entities/refreshToken.entity';
 import { Comment } from 'src/modules/comments/entities/comment.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
+import { Relationship } from 'src/modules/users/entities/relationship.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 
 export default {
@@ -12,7 +13,7 @@ export default {
     username: 'dbuser',
     password: 'dbpassword',
     database: 'dbname',
-    entities: [Post, User, Comment, RefreshToken],
+    entities: [Post, User, Comment, RefreshToken, Relationship],
     synchronize: true, // not to be used in prod
   } satisfies TypeOrmModuleOptions,
   jwtModuleConfig: {
