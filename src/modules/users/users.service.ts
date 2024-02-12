@@ -10,6 +10,8 @@ import { Relationship } from './entities/relationship.entity';
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Relationship)
+    private relationshipRepository: Repository<Relationship>,
   ) {}
 
   async findOneById(id: string): Promise<User> {
@@ -36,6 +38,11 @@ export class UsersService {
   async findOne(email?: string, username?: string): Promise<User> {
     return this.userRepository.findOne({
       where: [{ email }, { username }],
+      select: {
+        id: true,
+        username: true,
+        password: true,
+      },
     });
   }
 
@@ -46,7 +53,10 @@ export class UsersService {
   }
 
   async follow(followerId: string, followedId: string) {
-    const follower = await this.findOneById(followerId);
+    const follower = await this.userRepository.findOne({
+      where: { id: followerId },
+      relations: { following: true },
+    });
     const followed = await this.findOneById(followedId);
 
     if (!follower || !followed) {
@@ -59,10 +69,45 @@ export class UsersService {
 
     follower.following.push(relationship);
 
+    await this.relationshipRepository.save(relationship);
     await this.userRepository.save(follower);
   }
 
-  async getFollowers(userId: string) {
-    
+  async getFollowers(userId: string): Promise<Relationship[]> {
+    return this.relationshipRepository.find({
+      where: {
+        followedId: userId,
+      },
+      relations: {
+        followed: true,
+      },
+      select: {
+        followed: {
+          id: true,
+          username: true,
+          fullName: true,
+        },
+      },
+    });
+  }
+
+  async getFollowing(userId: string): Promise<Relationship[]> {
+    return await this.relationshipRepository.find({
+      where: {
+        followerId: userId,
+      },
+      relations: {
+        follower: true,
+      },
+      select: {
+        followedId: false,
+        followerId: false,
+        follower: {
+          id: true,
+          username: true,
+          fullName: true,
+        },
+      },
+    });
   }
 }

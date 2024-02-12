@@ -8,7 +8,7 @@ import {
 import { User } from './user.entity';
 
 @Entity()
-@Index(['followerId', 'followingId'], { unique: true })
+// @Index(['followerId', 'followedId'], { unique: true })
 export class Relationship {
   @PrimaryGeneratedColumn()
   id: number;
@@ -17,7 +17,7 @@ export class Relationship {
   followerId: string;
 
   @Column()
-  followingId: string;
+  followedId: string;
 
   @ManyToOne(() => User, (user) => user.following)
   follower: User;
