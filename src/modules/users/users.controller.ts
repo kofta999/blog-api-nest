@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Public } from '../auth/decorators/public.decorator';
 import { User } from '../auth/decorators/user.decorator';
+import { UserPayload } from 'src/shared/interfaces/UserPayload';
 
 @Controller('users')
 export class UsersController {
@@ -9,7 +10,7 @@ export class UsersController {
 
   @Post('/follow')
   async follow(
-    @User() { userId },
+    @User() { userId }: UserPayload,
     @Body() { followedId }: { followedId: string },
   ) {
     await this.usersService.follow(userId, followedId);
