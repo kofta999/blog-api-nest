@@ -1,4 +1,5 @@
 import { Comment } from 'src/modules/comments/entities/comment.entity';
+import { Bookmark } from 'src/modules/bookmarks/entities/bookmark.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import {
   Column,
@@ -27,8 +28,13 @@ export class Post {
   @Column({ select: false })
   userId: string;
 
-  @OneToMany(() => Comment, (comment) => comment.post)
+  @OneToMany(() => Comment, (comment) => comment.post, { onDelete: 'CASCADE' })
   comments: Comment[];
+
+  @OneToMany(() => Bookmark, (bookmark) => bookmark.post, {
+    onDelete: 'CASCADE',
+  })
+  bookmarks: Bookmark[];
 
   @CreateDateColumn()
   createdAt: Date;

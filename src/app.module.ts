@@ -6,6 +6,7 @@ import { PostsModule } from './modules/posts/posts.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { CommentsModule } from './modules/comments/comments.module';
+import { BookmarksModule } from './modules/bookmarks/bookmarks.module';
 import config from './config/keys';
 
 @Module({
@@ -15,6 +16,7 @@ import config from './config/keys';
     UsersModule,
     PostsModule,
     CommentsModule,
+    BookmarksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

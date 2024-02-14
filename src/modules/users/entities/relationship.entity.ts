@@ -1,7 +1,7 @@
 import {
   Column,
   Entity,
-  Index,
+  // Index,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
