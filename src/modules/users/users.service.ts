@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, QueryFailedError, Repository } from 'typeorm';
 import { ServiceError, ServiceErrorKey } from 'src/shared/errors/service.error';
 import { RegisterDto } from '../auth/dto/register.dto';
 import { Relationship } from './entities/relationship.entity';
@@ -13,6 +13,17 @@ export class UsersService {
     @InjectRepository(Relationship)
     private relationshipRepository: Repository<Relationship>,
   ) {}
+
+  private async getFollowUsers(followerId: string, followedId: string) {
+    const follower = await this.findOneById(followerId);
+    const followed = await this.findOneById(followedId);
+
+    if (!follower || !followed) {
+      throw new ServiceError(ServiceErrorKey.NotFound);
+    }
+
+    return { follower, followed };
+  }
 
   async findOneById(
     id: string,
@@ -47,25 +58,33 @@ export class UsersService {
     });
   }
 
-  async follow(followerId: string, followedId: string) {
-    const follower = await this.userRepository.findOne({
-      where: { id: followerId },
-      relations: { following: true },
-    });
-    const followed = await this.findOneById(followedId);
-
-    if (!follower || !followed) {
-      throw new ServiceError(ServiceErrorKey.NotFound);
-    }
-
+  async follow(followerId: string, followedId: string): Promise<void> {
+    const { follower, followed } = await this.getFollowUsers(
+      followerId,
+      followedId,
+    );
     const relationship = new Relationship();
     relationship.follower = follower;
     relationship.followed = followed;
 
-    follower.following.push(relationship);
+    try {
+      await this.relationshipRepository.save(relationship);
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        throw new ServiceError(ServiceErrorKey.AlreadyExists);
+      }
+    }
+  }
 
-    await this.relationshipRepository.save(relationship);
-    await this.userRepository.save(follower);
+  async unFollow(followerId: string, followedId: string): Promise<void> {
+    const result = await this.relationshipRepository.delete({
+      followedId,
+      followerId,
+    });
+
+    if (result.affected === 0) {
+      throw new ServiceError(ServiceErrorKey.NotFound);
+    }
   }
 
   async getFollowers(userId: string): Promise<Relationship[]> {
