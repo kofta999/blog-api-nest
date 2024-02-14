@@ -1,7 +1,14 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Post } from 'src/modules/posts/entities/post.entity';
 
+@Index(['userId', 'postId'], { unique: true })
 @Entity()
 export class Bookmark {
   @PrimaryGeneratedColumn()
@@ -15,4 +22,7 @@ export class Bookmark {
 
   @ManyToOne(() => Post, (post) => post.bookmarks)
   post: Post;
+
+  @Column()
+  postId: string;
 }

@@ -16,19 +16,27 @@ export class BookmarksService {
   ) {}
 
   async create(userId: string, postId: string): Promise<Bookmark> {
-    const user = await this.usersService.findOneById(userId);
+    const user = await this.usersService.findOneById(userId, {
+      select: {
+        id: true,
+      },
+    });
     if (!user) {
       throw new ServiceError(ServiceErrorKey.NotFound);
     }
 
-    const post = await this.postsService.findOne(postId);
+    const post = await this.postsService.findOne(postId, {
+      select: {
+        id: true,
+      },
+    });
     if (!post) {
       throw new ServiceError(ServiceErrorKey.NotFound);
     }
 
     const bookmark = new Bookmark();
-    bookmark.user = user;
-    bookmark.post = post;
+    bookmark.userId = userId;
+    bookmark.postId = postId;
 
     return this.bookmarkRepository.save(bookmark);
   }
@@ -37,6 +45,9 @@ export class BookmarksService {
     return this.bookmarkRepository.find({
       where: {
         userId,
+      },
+      select: {
+        postId: true,
       },
     });
   }

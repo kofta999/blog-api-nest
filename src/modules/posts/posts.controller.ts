@@ -15,7 +15,7 @@ import { UpdatePostDto, updatePostSchema } from './dto/update-post.dto';
 import { ZodValidationPipe } from '../../shared/pipes/validation.pipe';
 import { Public } from 'src/modules/auth/decorators/public.decorator';
 import { User } from 'src/modules/auth/decorators/user.decorator';
-import { User as UserEntity } from 'src/modules/users/entities/user.entity';
+import { UserPayload } from 'src/shared/interfaces/UserPayload';
 
 @Controller('posts')
 export class PostsController {
@@ -24,9 +24,9 @@ export class PostsController {
   @Post()
   create(
     @Body(new ZodValidationPipe(createPostSchema)) createPostDto: CreatePostDto,
-    @User() user: UserEntity,
+    @User() user: UserPayload,
   ) {
-    return this.postsService.create(createPostDto, user);
+    return this.postsService.create(createPostDto, user.userId);
   }
 
   @Public()
@@ -37,7 +37,7 @@ export class PostsController {
 
   @Public()
   @Get('/user/:id')
-  findByUser(@Param('userId') userId: string) {
+  findByUser(@Param('userId') { userId }: UserPayload) {
     return this.postsService.findByUser(userId);
   }
 
@@ -51,14 +51,14 @@ export class PostsController {
   update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updatePostSchema)) updatePostDto: UpdatePostDto,
-    @User() user: UserEntity,
+    @User() { userId }: UserPayload,
   ) {
-    return this.postsService.update(id, updatePostDto, user);
+    return this.postsService.update(id, updatePostDto, userId);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  async remove(@Param('id') id: string, @User() user: UserEntity) {
-    return this.postsService.remove(id, user);
+  async remove(@Param('id') id: string, @User() { userId }: UserPayload) {
+    return this.postsService.remove(id, userId);
   }
 }

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { User } from 'src/modules/users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
 import { Repository } from 'typeorm';
@@ -17,12 +16,12 @@ export class CommentsService {
   async create(
     createCommentDto: CreateCommentDto,
     postId: string,
-    user: User,
+    userId: string,
   ): Promise<Comment> {
     const comment = new Comment();
     comment.content = createCommentDto.content;
     comment.postId = postId;
-    comment.userId = user.id;
+    comment.userId = userId;
 
     return this.commentsRepository.save(comment);
   }
@@ -61,7 +60,7 @@ export class CommentsService {
   async update(
     id: string,
     updateCommentDto: UpdateCommentDto,
-    user: User,
+    userId: string,
   ): Promise<Comment> {
     const existingComment = await this.commentsRepository.findOne({
       where: { id },
@@ -70,7 +69,7 @@ export class CommentsService {
       throw new ServiceError(ServiceErrorKey.NotFound);
     }
 
-    if (user.id !== existingComment.userId) {
+    if (userId !== existingComment.userId) {
       throw new ServiceError(ServiceErrorKey.Forbidden);
     }
 
@@ -79,7 +78,7 @@ export class CommentsService {
     return this.commentsRepository.save(existingComment);
   }
 
-  async remove(id: string, user: User): Promise<void> {
+  async remove(id: string, userId: string): Promise<void> {
     const existingComment = await this.commentsRepository.findOne({
       where: { id },
     });
@@ -88,7 +87,7 @@ export class CommentsService {
       throw new ServiceError(ServiceErrorKey.NotFound);
     }
 
-    if (user.id !== existingComment.userId) {
+    if (userId !== existingComment.userId) {
       throw new ServiceError(ServiceErrorKey.Forbidden);
     }
 

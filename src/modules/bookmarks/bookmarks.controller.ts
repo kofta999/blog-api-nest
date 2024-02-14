@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { BookmarksService } from './bookmarks.service';
 import { User } from '../auth/decorators/user.decorator';
+import { UserPayload } from 'src/shared/interfaces/UserPayload';
 
 @Controller('bookmarks')
 export class BookmarksController {
@@ -8,14 +9,14 @@ export class BookmarksController {
 
   @Post()
   create(
-    @User() userId: string,
+    @User() { userId }: UserPayload,
     @Body() createBookmarkDto: { postId: string },
   ) {
     return this.bookmarksService.create(userId, createBookmarkDto.postId);
   }
 
   @Get()
-  findAll(@User() userId: string) {
+  findAll(@User() { userId }: UserPayload) {
     return this.bookmarksService.findAll(userId);
   }
 

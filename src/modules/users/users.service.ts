@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { ServiceError, ServiceErrorKey } from 'src/shared/errors/service.error';
 import { RegisterDto } from '../auth/dto/register.dto';
 import { Relationship } from './entities/relationship.entity';
@@ -14,18 +14,13 @@ export class UsersService {
     private relationshipRepository: Repository<Relationship>,
   ) {}
 
-  async findOneById(id: string): Promise<User> {
+  async findOneById(
+    id: string,
+    options: FindOneOptions<User> = {},
+  ): Promise<User> {
     const user = await this.userRepository.findOne({
-      where: {
-        id,
-      },
-      relations: {
-        refreshTokens: true,
-      },
-      select: {
-        id: true,
-        refreshTokens: true,
-      },
+      where: { id },
+      ...options,
     });
 
     if (!user) {

@@ -1,14 +1,14 @@
 import {
   Column,
   Entity,
-  // Index,
+  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
-// @Index(['followerId', 'followedId'], { unique: true })
+@Index(['followerId', 'followedId'], { unique: true })
 export class Relationship {
   @PrimaryGeneratedColumn()
   id: number;

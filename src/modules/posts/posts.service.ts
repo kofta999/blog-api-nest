@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/modules/users/entities/user.entity';
 import { ServiceError, ServiceErrorKey } from 'src/shared/errors/service.error';
 import { FindAllResource } from 'src/shared/interfaces/FindAllResource';
 
@@ -14,11 +13,11 @@ export class PostsService {
     @InjectRepository(Post) private postsRepository: Repository<Post>,
   ) {}
 
-  async create(createPostDto: CreatePostDto, user: User): Promise<Post> {
+  async create(createPostDto: CreatePostDto, userId: string): Promise<Post> {
     const post = new Post();
     post.content = createPostDto.content;
     post.title = createPostDto.title;
-    post.userId = user.id;
+    post.userId = userId;
 
     await this.postsRepository.save(post);
 
@@ -50,8 +49,11 @@ export class PostsService {
     };
   }
 
-  async findOne(id: string): Promise<Post> {
-    const post = await this.postsRepository.findOneBy({ id });
+  async findOne(id: string, options: FindOneOptions<Post> = {}): Promise<Post> {
+    const post = await this.postsRepository.findOne({
+      where: { id },
+      ...options,
+    });
 
     if (!post) {
       throw new ServiceError(ServiceErrorKey.NotFound);
@@ -71,7 +73,7 @@ export class PostsService {
   async update(
     id: string,
     updatePostDto: UpdatePostDto,
-    user: User,
+    userId: string,
   ): Promise<Post> {
     const postToUpdate = await this.postsRepository.findOne({
       where: {
@@ -88,7 +90,7 @@ export class PostsService {
       throw new ServiceError(ServiceErrorKey.NotFound);
     }
 
-    if (user.id !== postToUpdate.userId) {
+    if (userId !== postToUpdate.userId) {
       throw new ServiceError(ServiceErrorKey.Forbidden);
     }
 
@@ -100,7 +102,7 @@ export class PostsService {
     return updatedPost;
   }
 
-  async remove(id: string, user: User): Promise<void> {
+  async remove(id: string, userId: string): Promise<void> {
     const existingPost = await this.postsRepository.findOne({
       where: {
         id,
@@ -114,7 +116,7 @@ export class PostsService {
       throw new ServiceError(ServiceErrorKey.NotFound);
     }
 
-    if (user.id !== existingPost.userId) {
+    if (userId !== existingPost.userId) {
       throw new ServiceError(ServiceErrorKey.Forbidden);
     }
 

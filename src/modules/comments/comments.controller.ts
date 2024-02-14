@@ -16,7 +16,6 @@ import {
 } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { User } from 'src/modules/auth/decorators/user.decorator';
-import { User as UserEntity } from 'src/modules/users/entities/user.entity';
 import { ZodValidationPipe } from 'src/shared/pipes/validation.pipe';
 import { Public } from 'src/modules/auth/decorators/public.decorator';
 
@@ -29,9 +28,9 @@ export class CommentsController {
     @Body(new ZodValidationPipe(createCommentSchema))
     createCommentDto: CreateCommentDto,
     @Param('postId') postId: string,
-    @User() user: UserEntity,
+    @User() userId: string,
   ) {
-    return this.commentsService.create(createCommentDto, postId, user);
+    return this.commentsService.create(createCommentDto, postId, userId);
   }
 
   @Get()
@@ -49,14 +48,14 @@ export class CommentsController {
     @Body(new ZodValidationPipe(createCommentSchema))
     updateCommentDto: UpdateCommentDto,
     @Param('commentId') commentId: string,
-    @User() user: UserEntity,
+    @User() userId: string,
   ) {
-    return this.commentsService.update(commentId, updateCommentDto, user);
+    return this.commentsService.update(commentId, updateCommentDto, userId);
   }
 
   @Delete(':commentId')
   @HttpCode(204)
-  remove(@Param('commentId') commentId: string, @User() user: UserEntity) {
-    return this.commentsService.remove(commentId, user);
+  remove(@Param('commentId') commentId: string, @User() userId: string) {
+    return this.commentsService.remove(commentId, userId);
   }
 }
