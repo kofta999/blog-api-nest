@@ -6,9 +6,9 @@ Here's a high-level overview of the features I might want to implement:
 
 3. **Search with Pagination**: Users should be able to search for posts and the results should be paginated. This will involve adding a search endpoint to your API and implementing pagination for the search results.
 
-4. **Followings**: Users should be able to follow other users. You'll need to keep track of which users are following which users. This will involve adding endpoints to your API for following and unfollowing users, and for getting a user's followers and followings.
+4. **Followings**: Users should be able to follow other users. You'll need to keep track of which users are following which users. This will involve adding endpoints to your API for following and unfollowing users, and for getting a user's followers and followings. Done
 
-5. **Bookmarks**: Users should be able to bookmark posts. You'll need to keep track of which users have bookmarked which posts. This will involve adding endpoints to your API for bookmarking and unbookmarking posts, and for getting a user's bookmarked posts.
+5. **Bookmarks**: Users should be able to bookmark posts. You'll need to keep track of which users have bookmarked which posts. This will involve adding endpoints to your API for bookmarking and unbookmarking posts, and for getting a user's bookmarked posts. Done
 
 6. **User Details**: Users should be able to add more details to their profile, such as a profile picture. This will involve adding endpoints to your API for updating a user's profile and for uploading a profile picture.
 
