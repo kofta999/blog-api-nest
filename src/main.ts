@@ -6,7 +6,7 @@ import * as cookieParser from 'cookie-parser';
 import keys from './config/keys';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalFilters(new HttpErrorFilter());
   app.useGlobalInterceptors(new TransformInterceptor());
   app.use(cookieParser(keys.cookieConfig.secret));

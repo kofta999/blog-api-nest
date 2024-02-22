@@ -35,6 +35,12 @@ export class PostsService {
       take: limit,
       skip: (page - 1) * limit,
       order: { createdAt: 'DESC' },
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     const totalPages = Math.ceil(total / limit);
