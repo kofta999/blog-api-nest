@@ -35,16 +35,20 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const tokens = await this.authService.login(loginDto);
+    const result = await this.authService.login(loginDto);
 
-    response.cookie('refreshToken', tokens.refreshToken, {
+    response.cookie('refreshToken', result.refreshToken, {
       maxAge: keys.cookieConfig.maxAge,
       secure: true,
       sameSite: 'none',
       httpOnly: true,
     });
 
-    return { accessToken: tokens.accessToken };
+    return {
+      accessToken: result.accessToken,
+      userId: result.sub,
+      username: result.username,
+    };
   }
 
   @Get('/logout')

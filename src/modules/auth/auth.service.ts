@@ -102,9 +102,12 @@ export class AuthService {
     }
   }
 
-  async login(
-    loginUserDto: LoginDto,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  async login(loginUserDto: LoginDto): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    sub: string;
+    username: string;
+  }> {
     const currentUser = await this.userService.findOne(
       loginUserDto.email,
       loginUserDto.username,
@@ -128,6 +131,7 @@ export class AuthService {
     return {
       accessToken: await this.createAccessToken(payload),
       refreshToken: await this.createRefreshToken(payload),
+      ...payload,
     };
   }
 
