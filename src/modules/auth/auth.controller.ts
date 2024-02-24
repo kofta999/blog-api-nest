@@ -39,9 +39,10 @@ export class AuthController {
 
     response.cookie('refreshToken', result.refreshToken, {
       maxAge: keys.cookieConfig.maxAge,
-      secure: true,
-      sameSite: 'none',
+      path: '/',
       httpOnly: true,
+      sameSite: 'none',
+      secure: true,
     });
 
     return {
@@ -76,6 +77,7 @@ export class AuthController {
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
+    console.log(request.cookies);
     const { refreshToken } = request.cookies;
 
     if (!refreshToken) {

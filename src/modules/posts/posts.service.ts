@@ -13,7 +13,10 @@ export class PostsService {
     @InjectRepository(Post) private postsRepository: Repository<Post>,
   ) {}
 
-  async create(createPostDto: CreatePostDto, userId: string): Promise<Post> {
+  async create(
+    createPostDto: CreatePostDto,
+    userId: string,
+  ): Promise<Pick<Post, 'id'>> {
     const post = new Post();
     post.content = createPostDto.content;
     post.title = createPostDto.title;
@@ -21,7 +24,7 @@ export class PostsService {
 
     await this.postsRepository.save(post);
 
-    return post;
+    return { id: post.id };
   }
 
   async findAll(
